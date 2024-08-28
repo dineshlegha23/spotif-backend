@@ -1,18 +1,22 @@
 const express = require("express");
 require("express-async-errors");
 require("dotenv").config();
-const songsRouter = require("./routes/songsRouter");
 const connectDB = require("./config/dbConfig");
 const cloudinary = require("./config/cloudinaryConfig");
 const app = express();
+
+const songsRouter = require("./routes/songsRouter");
+const albumRouter = require("./routes/albumRoutes");
 
 const notFoundMiddleware = require("./middlewares/not-found");
 const errorHandlerMiddleware = require("./middlewares/error-handler");
 
 cloudinary();
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-app.use("/api/v1/", songsRouter);
+app.use("/api/v1/songs", songsRouter);
+app.use("/api/v1/albums", albumRouter);
 
 app.use(notFoundMiddleware);
 app.use(errorHandlerMiddleware);

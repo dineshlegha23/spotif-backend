@@ -1,19 +1,39 @@
 const { unlinkSync } = require("fs");
-const Song = require("../models//songModel");
+const Song = require("../models/Song");
 const { v2: cloudinary } = require("cloudinary");
 
 const addSong = async (req, res) => {
-  console.log(req.file);
+  const { name, singers, album, desc } = req.body;
 
-  const { name, singers } = req.body;
+  if (!name || !singers || !album || !desc) {
+    res.status(400).json({ msg: "Please provide all values" });
+  }
   let imageUrl;
+  let audioUrl;
   try {
-    imageUrl = await cloudinary.uploader.upload(req.file.path);
-    unlinkSync(req.file.path);
+    imageUrl = await cloudinary.uploader.upload(req.files.image[0].path);
+    audioUrl = await cloudinary.uploader.upload(req.files.audio[0].path, {
+      resource_type: "video",
+    });
+    unlinkSync(req.files.image[0].path);
+    unlinkSync(req.files.audio[0].path);
+    console.log(audioUrl);
   } catch (err) {
     console.log(`Cloudinary Error : ${err}`);
   }
-  const song = await Song.create({ name, singers, image: imageUrl.secure_url });
+
+  const duration = `${Math.floor(audioUrl.duration / 60)}:${Math.floor(
+    audioUrl.duration % 60
+  )}`;
+  const song = await Song.create({
+    name,
+    singers,
+    image: imageUrl.secure_url,
+    album,
+    desc,
+    file: audioUrl.secure_url,
+    duration,
+  });
 
   res.json({ msg: "Song added", data: song });
 };
@@ -23,4 +43,18 @@ const getAllSongs = async (req, res) => {
   res.json({ status: "success", total: songs.length, data: songs });
 };
 
-module.exports = { addSong, getAllSongs };
+const deleteSong = async (req, res) => {
+  const { id } = req.body;
+  if (!id) {
+    res.status(400).json({ msg: "Please provide a valid song id" });
+  }
+
+  const song = await Song.findByIdAndDelete(id);
+  if (!song) {
+    return res.status(400).json({ msg: "Not Found" });
+  }
+
+  res.status(200).json({ msg: "Deleted" });
+};
+
+module.exports = { addSong, getAllSongs, deleteSong };
