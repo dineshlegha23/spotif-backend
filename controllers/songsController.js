@@ -5,11 +5,23 @@ const { v2: cloudinary } = require("cloudinary");
 const addSong = async (req, res) => {
   const { name, singers, album, desc } = req.body;
 
-  if (!name || !singers || !album || !desc) {
-    res.status(400).json({ msg: "Please provide all values" });
+  if (
+    !name ||
+    name === "undefined" ||
+    !singers ||
+    singers === "undefined" ||
+    !album ||
+    album === "undefined" ||
+    !desc ||
+    desc === "undefined" ||
+    !req?.files?.image?.[0] ||
+    !req?.files?.audio?.[0]
+  ) {
+    return res.status(400).json({ msg: "Please provide all values" });
   }
   let imageUrl;
   let audioUrl;
+
   try {
     imageUrl = await cloudinary.uploader.upload(req.files.image[0].path);
     audioUrl = await cloudinary.uploader.upload(req.files.audio[0].path, {
@@ -17,7 +29,6 @@ const addSong = async (req, res) => {
     });
     unlinkSync(req.files.image[0].path);
     unlinkSync(req.files.audio[0].path);
-    console.log(audioUrl);
   } catch (err) {
     console.log(`Cloudinary Error : ${err}`);
   }
@@ -25,6 +36,7 @@ const addSong = async (req, res) => {
   const duration = `${Math.floor(audioUrl.duration / 60)}:${Math.floor(
     audioUrl.duration % 60
   )}`;
+
   const song = await Song.create({
     name,
     singers,
@@ -45,8 +57,9 @@ const getAllSongs = async (req, res) => {
 
 const deleteSong = async (req, res) => {
   const { id } = req.body;
+
   if (!id) {
-    res.status(400).json({ msg: "Please provide a valid song id" });
+    return res.status(400).json({ msg: "Please provide a valid song id" });
   }
 
   const song = await Song.findByIdAndDelete(id);

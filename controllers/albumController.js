@@ -9,7 +9,7 @@ const getAllAlbums = async (req, res) => {
 
 const addAlbum = async (req, res) => {
   const { name, desc, bgColor } = req.body;
-  if (!name || !desc || !bgColor) {
+  if (!name || !desc || !bgColor || !req.file.path) {
     return res.status(400).json({ msg: "Please provide all values" });
   }
 
