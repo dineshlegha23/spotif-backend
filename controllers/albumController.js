@@ -3,13 +3,13 @@ const Album = require("../models/Album");
 const { v2: cloudinary } = require("cloudinary");
 
 const getAllAlbums = async (req, res) => {
-  const albums = await Album.find({});
+  const albums = await Album.find({}).populate("songs");
   res.status(200).json({ total: albums.length, data: albums });
 };
 
 const addAlbum = async (req, res) => {
-  const { name, desc, bgColor } = req.body;
-  if (!name || !desc || !bgColor || !req.file.path) {
+  const { name, desc, bgcolor } = req.body;
+  if (!name || !desc || !bgcolor || !req.file.path) {
     return res.status(400).json({ msg: "Please provide all values" });
   }
 
@@ -23,7 +23,7 @@ const addAlbum = async (req, res) => {
   const album = await Album.create({
     name,
     desc,
-    bgColor,
+    bgcolor,
     image: imageurl.secure_url,
   });
   res.status(200).json(album);

@@ -9,6 +9,7 @@ const AlbumSchema = mongoose.Schema({
     default: "#349beb",
   },
   image: { type: String, required: [true, "Please provide album image"] },
+  songs: [{ type: mongoose.Types.ObjectId, ref: "Song" }],
 });
 
 module.exports = mongoose.model("Album", AlbumSchema);

@@ -5,7 +5,7 @@ const SongSchema = mongoose.Schema({
   image: { type: String, required: [true, "Please provide image"] },
   singers: { type: String, required: [true, "Please provide singer names"] },
   desc: { type: String, required: [true, "Please provide song description"] },
-  album: { type: String, required: [true, "Please provide album"] },
+  album: { type: String },
   file: { type: String, required: [true] },
   duration: { type: String, required: [true, "Please provide song duration"] },
 });

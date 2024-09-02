@@ -1,6 +1,7 @@
 const { unlinkSync } = require("fs");
 const Song = require("../models/Song");
 const { v2: cloudinary } = require("cloudinary");
+const Album = require("../models/Album");
 
 const addSong = async (req, res) => {
   const { name, singers, album, desc } = req.body;
@@ -10,8 +11,6 @@ const addSong = async (req, res) => {
     name === "undefined" ||
     !singers ||
     singers === "undefined" ||
-    !album ||
-    album === "undefined" ||
     !desc ||
     desc === "undefined" ||
     !req?.files?.image?.[0] ||
@@ -41,11 +40,16 @@ const addSong = async (req, res) => {
     name,
     singers,
     image: imageUrl.secure_url,
-    album,
     desc,
     file: audioUrl.secure_url,
     duration,
   });
+
+  if (album) {
+    const albumSong = await Album.findOne({ _id: album });
+    albumSong.songs.push(song._id);
+    const albumData = await albumSong.save();
+  }
 
   res.json({ msg: "Song added", data: song });
 };
