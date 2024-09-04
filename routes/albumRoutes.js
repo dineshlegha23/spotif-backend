@@ -5,8 +5,8 @@ const {
   addAlbum,
   getAllAlbums,
   deleteAlbum,
+  getSingleAlbum,
 } = require("../controllers/albumController");
-const { getAllAlbumsWithSongs } = require("../controllers/songsController");
 
 router
   .route("/")
@@ -14,5 +14,6 @@ router
   .get(getAllAlbums)
   .delete(deleteAlbum);
 
-router.route("/albumsongs", getAllAlbumsWithSongs);
+router.route("/:id").get(getSingleAlbum);
+
 module.exports = router;

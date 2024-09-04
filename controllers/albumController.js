@@ -3,7 +3,7 @@ const Album = require("../models/Album");
 const { v2: cloudinary } = require("cloudinary");
 
 const getAllAlbums = async (req, res) => {
-  const albums = await Album.find({}).populate("songs");
+  const albums = await Album.find({}).select("image name");
   res.status(200).json({ total: albums.length, data: albums });
 };
 
@@ -43,4 +43,14 @@ const deleteAlbum = async (req, res) => {
   res.status(200).json(album);
 };
 
-module.exports = { getAllAlbums, addAlbum, deleteAlbum };
+const getSingleAlbum = async (req, res) => {
+  const { id } = req.params;
+  if (!id) {
+    return res.status(400).json({ msg: "Please provide album id" });
+  }
+
+  const album = await Album.findOne({ _id: id }).populate("songs");
+  res.status(200).json({ totalSongs: album.songs.length, album });
+};
+
+module.exports = { getAllAlbums, addAlbum, deleteAlbum, getSingleAlbum };

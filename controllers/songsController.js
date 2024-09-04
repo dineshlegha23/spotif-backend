@@ -4,7 +4,7 @@ const { v2: cloudinary } = require("cloudinary");
 const Album = require("../models/Album");
 
 const addSong = async (req, res) => {
-  const { name, singers, album, desc } = req.body;
+  const { name, singers, desc } = req.body;
 
   if (
     !name ||
@@ -18,6 +18,7 @@ const addSong = async (req, res) => {
   ) {
     return res.status(400).json({ msg: "Please provide all values" });
   }
+
   let imageUrl;
   let audioUrl;
 
@@ -36,17 +37,20 @@ const addSong = async (req, res) => {
     audioUrl.duration % 60
   )}`;
 
+  let album = req.body.album || null;
+
   const song = await Song.create({
     name,
     singers,
     image: imageUrl.secure_url,
     desc,
+    album,
     file: audioUrl.secure_url,
     duration,
   });
 
-  if (album) {
-    const albumSong = await Album.findOne({ _id: album });
+  if (req.body.albumId) {
+    const albumSong = await Album.findOne({ _id: req.body.albumId });
     albumSong.songs.push(song._id);
     const albumData = await albumSong.save();
   }
