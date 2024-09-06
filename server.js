@@ -17,6 +17,9 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.get("/", (req, res) => {
+  res.send("API working");
+});
 app.use("/api/v1/songs", songsRouter);
 app.use("/api/v1/albums", albumRouter);
 app.get("/health", (req, res) => {
